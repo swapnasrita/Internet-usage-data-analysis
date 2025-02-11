@@ -1,37 +1,82 @@
 # Internet-usage-data-analysis
 
-Analyzing global internet patterns
+📊 Analyzing Global Internet Patterns
+
 📖 Background
-We explore a dataset that highlights internet usage for different countries from 2000 to 2023. By conducting a thorough analysis, we dive deeper into how internet usage has changed over time and the countries still widely impacted by lack of internet availability. Apart from the internet usage, I also look at world population and GDP data from World In Data.
+This project explores a dataset that highlights internet usage across different countries from 2000 to 2023. By conducting a thorough analysis, we examine internet adoption trends over time and identify countries still struggling with low penetration. Additionally, we incorporate world population and GDP data from World In Data to assess key influencing factors.
 
-💾 Data
-Interet Usage (internet_usage.csv)
-Column name	Description
+💾 Data Sources
+📌 Internet Usage Data (internet_usage.csv)
+
+Column Name	Description
 Country Name	Name of the country
-Country Code	Countries 3 character country code
-2000	Contains the % of population of individuals using the internet in 2000
-2001	Contains the % of population of individuals using the internet in 2001
-2002	Contains the % of population of individuals using the internet in 2002
-2003	Contains the % of population of individuals using the internet in 2003
-....	...
-2023	Contains the % of population of individuals using the internet in 2023
-Steps performed before data analysis
-I used Power BI to perform all the steps of data analysis.
+Country Code	Three-character country code
+2000-2023	Percentage of the population using the internet in each year
 
-Cleaning the data: Replacing non-numeric value (e.g. '..') by null.
-Determining type of data: Ensuring that all the internet usage data was identified as numeric.
-Merging the data based on the key 'Country Code' to add world population and GDP in 2022 to the internet usage data. Using 'Country Code' helped ensure that we were not losing important data based on 'Country Names'. There can be debates about how the country is named or if the country has been renamed. So, country code was helpful in maintaining the connection.
-Data Analysis
-Early vs Late adopters
-Find first year when adoption reached a threshold: I chose the threshold to be 20%. Any internet usage below 20% is low penetration and any usage higher than 90% is high penetration. So, I filtered the internet usage column to be above 20%. Then refiltered for each country to pick the minimum year. = Table.Group(#"Filtered Rows1", {"Country Name"}, {{"First Adoption Year", each List.Min([Year]), type nullable number}})
-Adding Rank to the Countries
-Ranking the countries according to adoption year helped sort out the countries later according to continent. = Table.AddIndexColumn(#"Sorted Rows", "Index", 1, 1, Int64.Type)
-Penetration per Continent
-Combining Step 1 and 2, we can plot the first adoption years for each country in a particular continent, giving us an overall view of which continent was an early adopter and which continents lagged.
-Global Internet Usage
-Taking average of internet usage through the years help us look at the exponential growth in internet usage globally.
-YOY change
-Create two measures: Previous year usage and this year usage.
+Additional data was merged from World In Data to include:
+
+Population (2022)
+
+GDP per capita (2022)
+
+🛠️ Data Preparation
+
+The analysis was performed entirely in Power BI, following these preprocessing steps:
+
+Data Cleaning:
+
+Replaced non-numeric values ('..') with null values.
+Ensured that all internet usage data was correctly typed as numeric.
+
+Merging External Data:
+
+Used Country Code as a key identifier to merge population and GDP data.
+
+This approach ensured accuracy, preventing mismatches due to country name variations.
+
+📊 Data Analysis & Key Insights
+
+1️⃣ Early vs. Late Adopters
+
+First Adoption Year Calculation (Threshold: 20% Internet Usage)
+
+Countries were classified based on when they first surpassed 20% penetration.
+Countries exceeding 90% penetration were considered high adopters.
+
+DAX Query (Power BI)
+
+
+First Adoption Year = 
+    Table.Group(#"Filtered Rows1", {"Country Name"}, 
+    {{"First Adoption Year", each List.Min([Year]), type nullable number}})
+    
+Ranking Countries by Adoption Year
+
+Countries were ranked by adoption year for better sorting and visualization.
+
+
+Adoption Rank = 
+    Table.AddIndexColumn(#"Sorted Rows", "Index", 1, 1, Int64.Type)
+    
+2️⃣ Internet Penetration per Continent
+
+By combining First Adoption Year and Rankings, we visualized internet penetration trends for each continent, showing:
+
+✅ Early Adopters: North America & Europe
+
+❌ Late Adopters: Africa & South Asia
+
+3️⃣ Global Internet Usage Trends
+
+Taking the average internet usage per year reveals exponential growth globally.
+Some countries rapidly progressed, while others lagged due to economic or policy constraints.
+
+4️⃣ Year-over-Year (YoY) Change in Internet Adoption
+
+To analyze annual growth trends, we calculated YoY change for each country:
+
+DAX
+
 YoY_Change = 
 VAR PrevYearUsage = 
     CALCULATE(
@@ -49,22 +94,81 @@ RETURN
         (CurrentYearUsage - PrevYearUsage) / PrevYearUsage * 100, 
         BLANK()
     )
+    
+✅ Key Findings:
 
-This helps us look at the adoption in the early years vs now.
+Pre-2010: High YoY fluctuations, indicating rapid adoption in some regions.
+Post-2015: Stabilized growth, suggesting market saturation in developed economies.
 
-Factors influencing internet usage
-(This might be my favorite part) I wondered if GDP and population might be reasons why internet usage was low in certain countries. 6. Plotting population versus internet usage and GDP versus internet usage gives us an idea on how correlated these factors are.
+5️⃣ Factors Influencing Internet Usage
 
-Suggestions by Author
-Governments and global organizations should focus on targeted investments in underdeveloped regions, particularly in rural areas, to bridge the digital divide.
-Tech companies should shift focus to emerging markets where adoption potential is still high, offering affordable solutions like low-cost mobile data and public Wi-Fi.
-Countries with lower GDPs can adopt innovative models like public-private partnerships and international funding to prioritize digital infrastructure, accelerating adoption.
-Focus on inclusive policies like free or subsidized internet access for underserved populations, particularly in regions with high population densities but low penetration rates.
-🧾 Executive summary
-GDP significantly influences internet adoption. High-GDP countries invest more in digital infrastructure and accessibility, leading to higher penetration rates. In contrast, low-GDP nations struggle with affordability and infrastructure challenges, slowing adoption rates.
+📌 GDP vs. Internet Usage
 
-Fluctuations in YoY growth were notable during earlier periods, particularly before 2010, indicating phases of rapid adoption.
+Strong correlation observed: Higher GDP leads to greater internet penetration.
+Developed nations invest more in digital infrastructure, making the internet more accessible.
 
-After 2015, YoY changes stabilized across most regions, likely due to market saturation in developed nations and steady growth in emerging markets.
+📌 Population vs. Internet Usage
 
-All countries shows a clear trajectory of steady internet adoption.
+Surprisingly weak correlation!
+Some high-population countries (e.g., India) still have low penetration.
+Other small nations have nearly 100% connectivity.
+
+📢 Suggestions & Recommendations
+
+1️⃣ Bridging the Digital Divide
+
+Governments should invest in rural connectivity projects, particularly in Africa & South Asia.
+Focus on affordable mobile data solutions and public Wi-Fi in underserved areas.
+
+2️⃣ Encouraging Market Expansion
+
+Tech companies should prioritize emerging markets, where adoption potential remains high.
+Low-cost internet plans and 5G expansion can accelerate connectivity.
+
+3️⃣ Leveraging Public-Private Partnerships
+
+Countries with lower GDP can adopt PPP models to improve infrastructure.
+International funding & investments in broadband expansion can help boost connectivity.
+
+4️⃣ Inclusive Digital Policies
+
+Implement subsidized internet plans for low-income populations.
+Provide digital literacy programs to encourage effective internet usage.
+
+📌 Executive Summary
+
+Global internet penetration is 71.29%, with ~2.3 billion people still unconnected.
+
+GDP strongly influences adoption, but population size alone does not.
+
+Internet usage saw rapid early growth, stabilizing post-2015.
+
+Developed countries adopted the internet earlier, while low-GDP nations face infrastructure challenges.
+
+Strategic investments in infrastructure, affordability, and digital literacy can accelerate global adoption.
+
+📁 Repository Structure
+
+📂 Global-Internet-Analysis
+│── 📄 README.md   # Project documentation
+│── 📊 internet_usage.csv  # Internet penetration dataset
+│── 📊 world_population.csv  # Population dataset
+│── 📊 gdp_data.csv  # GDP dataset
+│── 📜 data_analysis.pbix  # Power BI file (too big! Email me directly for file.)
+│── 📜 report.ipynb  # Jupyter Notebook with additional insights
+│── 📂 visualizations
+│   ├── adoption_trends.png
+│   ├── global_usage.png
+│   ├── yoy_change.png
+│── 📜 LICENSE
+
+📌 Future Work
+
+Expand analysis to mobile vs broadband penetration.
+Predict future internet penetration rates using machine learning.
+Compare government policies vs internet growth rates.
+
+🙌 Acknowledgments
+
+World In Data for GDP & Population Data.
+Power BI & Jupyter Notebook for data analysis & visualization.
